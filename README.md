@@ -102,9 +102,27 @@ Example Output (part-r-00000)
 
 3    test
 ```
+# Comments on own input 
 
-Author
+Each line is a word followed by its count.
+Words are counted across the entire input file.
+
+**Example checks:**
+
+hello appears 2 times → matches output.
+
+hadoop appears 3 times → matches output.
+
+test appears 3 times → matches output.
+
+Other words like world, used, data, etc., each appear once → correctly shown as 1.
+Overall, this output confirms that:
+Mapper is splitting text into words correctly.
+Reducer is summing up counts correctly.
+The pipeline (HDFS input → Map → Reduce → HDFS output) is working end-to-end.
+
+# Author
 Yogasri Lella
 
-Course: Cloud Computing for Data Analysis (ITCS 6190/8190, Fall 2025)
-Instructor: Prof. Marco Vieira
+# Course: Cloud Computing for Data Analysis (ITCS 6190/8190, Fall 2025)
+# Instructor: Prof. Marco Vieira
