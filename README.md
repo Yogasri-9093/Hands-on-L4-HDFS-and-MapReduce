@@ -27,22 +27,84 @@ The program uses two main components:
 
 ## Execution Steps
 
-### 1. Build the JAR with Maven
-```bash
-1. Start the Hadoop Cluster
+
+# 1) Start the Hadoop cluster
+Run the Compose stack in the background.
+``` bash
 docker compose up -d
-cd ~/Downloads/wordcount
-mvn clean package
-The compiled JAR will be inside target/, for example:
-target/wordcount-1.0-SNAPSHOT.jar
-2. Start Hadoop (HDFS + YARN)
-start-dfs.sh
-start-yarn.sh
-3. Copy JAR and Input File into the Container
-docker cp target/wordcount-1.0-SNAPSHOT.jar hadoop:/root/jar/wordcount-1.0-SNAPSHOT.jar
-docker cp data/input.txt                      hadoop:/root/data/input.txt
 
 ```
+
+# 2) Build the code (on your host)
+Compile the project with Maven; the JAR lands in target/.
+```bash
+mvn clean package
+   resulting jar: target/wordcount-1.0-SNAPSHOT.jar
+```
+ 
+# 3) Copy the JAR into the container
+Place your JAR where you’ll reference it from inside the container.
+```bash
+docker cp target/wordcount-1.0-SNAPSHOT.jar hadoop:/root/jar/wordcount-1.0-SNAPSHOT.jar
+```
+# 4) Copy the dataset into the container
+Put your input text file into the container.
+``` bash
+docker cp data/input.txt hadoop:/root/data/input.txt
+```
+
+# 5) (Optional) Open a shell in the container
+Useful if you want to run the HDFS commands interactively.
+``` bash
+docker exec -it hadoop /bin/bash
+```
+# 6) Put the input into HDFS
+Create an input dir in HDFS and upload the dataset.
+``` bash
+docker exec -it hadoop bash -lc '
+  hdfs dfs -mkdir -p /user/root/wordcount/input &&
+  hdfs dfs -put -f /root/data/input.txt /user/root/wordcount/input/
+```
+'
+# 7) Run the MapReduce job
+Run your job with three args: <input> <tmp_out> <final_out>.
+```bash docker exec -it hadoop bash -lc '
+  hdfs dfs -rm -r -f /user/root/wordcount/tmp /user/root/wordcount/output || true &&
+  hadoop jar /root/jar/wordcount-1.0-SNAPSHOT.jar org.example.WordCount \
+    /user/root/wordcount/input \
+    /user/root/wordcount/tmp \
+    /user/root/wordcount/output
+```
+'
+If you ever hit “Output directory already exists,” delete it and re-run:
+docker exec -it hadoop bash -lc 'hdfs dfs -rm -r -f /user/root/wordcount/output'
+# 8) View the output in HDFS
+List the output and print the results.
+```bash
+docker exec -it hadoop bash -lc '
+  hdfs dfs -ls  /user/root/wordcount/output &&
+  hdfs dfs -cat /user/root/wordcount/output/part-*
+```
+'
+# 9) Copy results back to your host (optional)
+Fetch from HDFS to the container, then from container to your host.
+```bash
+docker exec -it hadoop bash -lc 'hdfs dfs -get -f /user/root/wordcount/output /root/wc_out'
+docker cp hadoop:/root/wc_out ./wc_out
+cat wc_out/part-*
+```
+# 10) Commit input & output to GitHub
+Add your input dataset and the produced output to your repo.
+ ensure these paths exist locally:
+ - data/input.txt (your dataset)
+ - wc_out/part-r-00000 (downloaded result)
+
+```bash git add data/input.txt wc_out
+git commit -m "Add WordCount input dataset and output"
+git push
+
+```
+
 # **Challenges Faced & Solutions**
 
 Compilation errors
