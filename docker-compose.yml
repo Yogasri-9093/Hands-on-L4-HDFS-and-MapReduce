@@ -1,16 +1,12 @@
-version: "3.9"
-
 services:
   hadoop:
-    image: harisekhon/hadoop:3.4
+    image: harisekhon/hadoop
     container_name: hadoop
     hostname: hadoop
-    restart: unless-stopped
     ports:
-      - "9870:9870"   # HDFS NameNode UI
-      - "9864:9864"   # DataNode UI
-      - "8088:8088"   # YARN ResourceManager UI
+      - "9870:9870"   # HDFS UI
+      - "8088:8088"   # YARN UI
     volumes:
-      - ./data:/data:ro   # host -> container input files
-      - ./target:/jar:ro  # host -> container built jar(s)
-      - ./out:/out        # where we’ll copy results to commit
+      - ./data:/data:ro      # share your input data
+      - ./target:/jar:ro     # share your built JAR
+      - ./out:/out           # optional: save output locally
