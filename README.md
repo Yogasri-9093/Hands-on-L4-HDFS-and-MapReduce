@@ -45,41 +45,66 @@ hadoop jar target/wordcount-1.0-SNAPSHOT.jar \
   /user/$USER/wordcount/input \
   /user/$USER/wordcount/output
 5. View Results
-hdfs dfs -cat /user/$USER/wordcount/output/part-r-00000
-Challenges Faced & Solutions
+hdfs dfs -cat /user/$USER/wordcount/output/part-r-00000 
+```
+# **Challenges Faced & Solutions**
+
 Compilation errors
-Public classes (WordCount, SumReducer, SortMapper) were not in correctly named files.
-✅ Solution: Renamed files to match class names (WordCount.java, SumReducer.java, etc.).
+**Public classes** (WordCount, SumReducer, SortMapper) were not in correctly named files.
+ Solution: Renamed files to match class names (WordCount.java, SumReducer.java, etc.).
 HDFS connection refused errors
-Hadoop services (NameNode, DataNode, ResourceManager) were not running.
-✅ Solution: Restarted cluster using start-dfs.sh and start-yarn.sh. Verified with jps.
+
+**Hadoop services** (NameNode, DataNode, ResourceManager) were not running.
+ Solution: Restarted cluster using start-dfs.sh and start-yarn.sh. Verified with jps.
 Old output files blocking new runs
-Hadoop throws an error if the output directory already exists.
-✅ Solution: Always delete old output before rerunning:
+
+**Hadoop** throws an error if the output directory already exists.
+ Solution: Always delete old output before rerunning:
 hdfs dfs -rm -r -f /user/$USER/wordcount/output
-Native library warnings
+
+**Native library warnings**
 Messages about NativeCodeLoader appeared, but they are harmless.
-✅ Solution: Ignored since job still runs correctly.
-Input and Obtained Output
+ Solution: Ignored since job still runs correctly.
+
+# **Input and Obtained Output**
+
 Example Input (data/input.txt)
+``` bash
 hello hadoop
 hadoop is powerful
 big data is used for hello world
 test test test example wordcount mapreduce hadoop
+
+ 
 Example Output (part-r-00000)
+
 1    world
+
 1    used
+
 1    powerful
+
 1    for
+
 1    data
+
 1    big
+
 2    hello
+
 3    hadoop
+
 1    wordcount
+
 1    mapreduce
+
 1    example
+
 3    test
+```
+
 Author
 Yogasri Lella
+
 Course: Cloud Computing for Data Analysis (ITCS 6190/8190, Fall 2025)
 Instructor: Prof. Marco Vieira
