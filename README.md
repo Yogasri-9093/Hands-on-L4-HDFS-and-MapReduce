@@ -29,6 +29,8 @@ The program uses two main components:
 
 ### 1. Build the JAR with Maven
 ```bash
+1. Start the Hadoop Cluster
+docker compose up -d
 cd ~/Downloads/wordcount
 mvn clean package
 The compiled JAR will be inside target/, for example:
@@ -36,16 +38,10 @@ target/wordcount-1.0-SNAPSHOT.jar
 2. Start Hadoop (HDFS + YARN)
 start-dfs.sh
 start-yarn.sh
-3. Upload Input File to HDFS
-hdfs dfs -mkdir -p /user/$USER/wordcount/input
-hdfs dfs -put -f data/input.txt /user/$USER/wordcount/input
-4. Run the MapReduce Job
-hadoop jar target/wordcount-1.0-SNAPSHOT.jar \
-  org.example.WordCount \
-  /user/$USER/wordcount/input \
-  /user/$USER/wordcount/output
-5. View Results
-hdfs dfs -cat /user/$USER/wordcount/output/part-r-00000 
+3. Copy JAR and Input File into the Container
+docker cp target/wordcount-1.0-SNAPSHOT.jar hadoop:/root/jar/wordcount-1.0-SNAPSHOT.jar
+docker cp data/input.txt                      hadoop:/root/data/input.txt
+
 ```
 # **Challenges Faced & Solutions**
 
